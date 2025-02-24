@@ -1,5 +1,5 @@
 import { BitcoinAdapter } from "@reown/appkit-adapter-bitcoin"
-import { bitcoin, bitcoinTestnet } from "@reown/appkit/networks"
+import { bitcoin, bitcoinTestnet , bob , bobSepolia } from "@reown/appkit/networks"
 import type { AppKitNetwork } from "@reown/appkit/networks"
 
 export const projectId =
@@ -9,7 +9,7 @@ if (!projectId) {
   throw new Error("Project ID is not defined")
 }
 
-export const networks = [bitcoin, bitcoinTestnet] as [
+export const networks = [bitcoin, bitcoinTestnet , bob , bobSepolia] as [
   AppKitNetwork,
   ...AppKitNetwork[],
 ]
