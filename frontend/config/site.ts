@@ -14,8 +14,8 @@ export const siteConfig = {
       href: "/positions",
     },
     {
-      title: "Transactions",
-      href: "/portfolio/transactions",
+      title: "Invest",
+      href: "/invest",
     }
   ],
   links: {

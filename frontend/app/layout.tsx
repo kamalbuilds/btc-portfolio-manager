@@ -1,5 +1,5 @@
 "use client";
-import "@/styles/globals.css"
+import "@/app/globals.css"
 import { Metadata } from "next"
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from "@/components/theme-provider"
@@ -14,6 +14,7 @@ import { UserSession, AppConfig } from "@stacks/auth";
 import { useEffect } from "react"
 import { AppContextProvider } from "../components/AppContext";
 import { useState } from "react";
+import { BasketProvider } from "@/context/BasketContext";
 
 
 const inter = Inter({ subsets: ['latin'] })
@@ -94,6 +95,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
             <AppContextProvider userData={userData}>
       <Providers>
+        <BasketProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -106,6 +108,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             </div>
             <TailwindIndicator />
           </ThemeProvider>
+          </BasketProvider>
         </Providers>
             </AppContextProvider>
           
