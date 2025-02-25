@@ -98,7 +98,7 @@ graph TB
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/btc-portfolio-manager.git
+git clone https://github.com/kamalbuilds/btc-portfolio-manager.git
 cd btc-portfolio-manager
 ```
 
