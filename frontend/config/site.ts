@@ -16,11 +16,7 @@ export const siteConfig = {
     {
       title: "Transactions",
       href: "/portfolio/transactions",
-    },
-    {
-      title: "Settings",
-      href: "/portfolio/settings",
-    },
+    }
   ],
   links: {
     twitter: "https://twitter.com/kamalbuilds",
