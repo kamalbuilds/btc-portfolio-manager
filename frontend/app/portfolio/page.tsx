@@ -1,13 +1,21 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, memo } from "react"
 import {
   ArrowDownLeft,
   ArrowUpRight,
   BarChart,
-  LineChart,
+  LineChart as LineChartIcon,
   Wallet,
 } from "lucide-react"
+import {
+  ResponsiveContainer,
+  LineChart as RechartsLineChart,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Line
+} from "recharts"
 
 import type { PortfolioStats, Transaction } from "@/types/sbtc"
 import { sbtcService } from "@/lib/sbtc-service"
@@ -20,74 +28,133 @@ import { TransactionList } from "@/components/transaction-list"
 import { WithdrawalModal } from "@/components/withdrawal-modal"
 import { useAppKitAccount } from "@reown/appkit/react"
 
+interface PriceDataPoint {
+  timestamp: string;
+  price: number;
+}
+
+// Memoize the PriceChart component
+// const PriceChart = memo(({ data }: { data: PriceDataPoint[] }) => {
+//   return (
+//     <div className="h-64 w-full">
+//       <ResponsiveContainer width="100%" height="100%">
+//         <RechartsLineChart data={data}>
+//           <XAxis dataKey="timestamp" />
+//           <YAxis />
+//           <Tooltip />
+//           <Line
+//             type="monotone"
+//             dataKey="price"
+//             stroke="#8884d8"
+//             dot={false}
+//             isAnimationActive={false}
+//           />
+//         </RechartsLineChart>
+//       </ResponsiveContainer>
+//     </div>
+//   )
+// })
+
+// PriceChart.displayName = 'PriceChart'
+
 export default function PortfolioPage() {
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false)
   const [isWithdrawalModalOpen, setIsWithdrawalModalOpen] = useState(false)
-  const [stats, setStats] = useState<PortfolioStats>({
-    totalBalance: 0,
-    totalDeposits: 0,
-    totalWithdrawals: 0,
-    priceChange24h: 0,
-    btcPrice: 0,
-    sbtcPrice: 0,
-  })
+  const [stats, setStats] = useState<PortfolioStats | null>(null)
   const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [priceData, setPriceData] = useState<PriceDataPoint[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
   const address = 'SP1JNQEQE3NKFD6W0JWWNJD1P1M906P9EYSV671B5';
+  
+  // Memoize the fetchData function to prevent unnecessary re-renders
+  const fetchData = async () => {
+    if (!address) return;
+
+    try {
+      setIsLoading(true)
+      setError("")
+
+      const [portfolioStats, txHistory] = await Promise.all([
+        sbtcService.getPortfolioStats(address),
+        sbtcService.getTransactions(address),
+      ])
+
+      // Only update state if the values have changed
+      setStats(prevStats => {
+        if (JSON.stringify(prevStats) !== JSON.stringify(portfolioStats)) {
+          return portfolioStats;
+        }
+        return prevStats;
+      });
+
+      setTransactions(prevTx => {
+        if (JSON.stringify(prevTx) !== JSON.stringify(txHistory)) {
+          return txHistory;
+        }
+        return prevTx;
+      });
+    } catch (err) {
+      console.error("Failed to fetch portfolio data:", err)
+      setError(err instanceof Error ? err.message : "Failed to load portfolio data")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
-    const fetchData = async () => {
-
-      if (!address) return;
-
-      try {
-        setIsLoading(true)
-        setError("")
-
-        const [portfolioStats, txHistory] = await Promise.all([
-          sbtcService.getPortfolioStats(address),
-          sbtcService.getTransactions(address),
-        ])
-
-        setStats(portfolioStats)
-        setTransactions(txHistory)
-      } catch (err) {
-        console.error("Failed to fetch portfolio data:", err)
-        setError("Failed to load portfolio data")
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
+    // Initial fetch
     fetchData()
-  }, [address])
 
+    // Set up polling for transaction updates
+    const pollInterval = setInterval(fetchData, 30000) // Poll every 30 seconds
 
-  const handleDepositSuccess = (txId: string) => {
-    // Optimistically add the transaction to the list
-    const newTx: Transaction = {
-      id: txId,
-      type: "deposit",
-      amount: 0, // Will be updated when confirmed
-      status: "pending",
-      timestamp: new Date().toISOString(),
-      txId,
+    return () => {
+      clearInterval(pollInterval)
     }
-    setTransactions([newTx, ...transactions])
+  }, [address]) // Only re-run if address changes
+
+  const handleDepositSuccess = async (txId: string) => {
+    try {
+      // Get the deposit details from Emily API
+      const deposit = await sbtcService.getDepositStatus(txId)
+      
+      // Optimistically add the transaction to the list
+      const newTx: Transaction = {
+        id: txId,
+        type: "deposit",
+        amount: 0, // Will be updated when confirmed
+        status: deposit.status,
+        timestamp: new Date().toISOString(),
+        txId,
+      }
+      setTransactions([newTx, ...transactions])
+    } catch (err) {
+      console.error("Failed to get deposit status:", err)
+    }
   }
 
-  const handleWithdrawalSuccess = (requestId: string) => {
-    // Optimistically add the transaction to the list
-    const newTx: Transaction = {
-      id: requestId,
-      type: "withdrawal",
-      amount: 0, // Will be updated when confirmed
-      status: "pending",
-      timestamp: new Date().toISOString(),
+  const handleWithdrawalSuccess = async (requestId: string) => {
+    try {
+      // Get the withdrawal details from Emily API
+      const withdrawal = await sbtcService.getWithdrawalStatus(requestId)
+      
+      // Optimistically add the transaction to the list
+      const newTx: Transaction = {
+        id: requestId,
+        type: "withdrawal",
+        amount: 0, // Will be updated when confirmed
+        status: withdrawal.status,
+        timestamp: new Date().toISOString(),
+        txId: withdrawal.txId,
+      }
+      setTransactions([newTx, ...transactions])
+    } catch (err) {
+      console.error("Failed to get withdrawal status:", err)
     }
-    setTransactions([newTx, ...transactions])
   }
+
 
   if (isLoading) {
     return (
@@ -116,11 +183,11 @@ export default function PortfolioPage() {
             <div>
               <p className="text-sm text-gray-500">Total Balance</p>
               <p className="text-2xl font-bold">
-                {formatBTC(stats.totalBalance)}
+                {formatBTC(stats?.totalBalance || 0)}
               </p>
-              {stats.btcPrice && (
+              {stats?.btcPrice !== undefined && stats.btcPrice > 0 && (
                 <p className="text-sm text-gray-500">
-                  {formatUSD(stats.totalBalance * stats.btcPrice)}
+                  {formatUSD(stats.totalBalance * (stats.btcPrice || 0))}
                 </p>
               )}
             </div>
@@ -133,7 +200,7 @@ export default function PortfolioPage() {
             <div>
               <p className="text-sm text-gray-500">Total Deposits</p>
               <p className="text-2xl font-bold">
-                {formatBTC(stats.totalDeposits)}
+                {formatBTC(stats?.totalDeposits || 0)}
               </p>
             </div>
             <ArrowUpRight className="size-8 text-green-500" />
@@ -145,7 +212,7 @@ export default function PortfolioPage() {
             <div>
               <p className="text-sm text-gray-500">Total Withdrawals</p>
               <p className="text-2xl font-bold">
-                {formatBTC(stats.totalWithdrawals)}
+                {formatBTC(stats?.totalWithdrawals || 0)}
               </p>
             </div>
             <ArrowDownLeft className="size-8 text-red-500" />
@@ -158,12 +225,12 @@ export default function PortfolioPage() {
               <p className="text-sm text-gray-500">24h Change</p>
               <p className="text-2xl font-bold">
                 {calculatePercentageChange(
-                  stats.sbtcPrice || 0,
-                  (stats.sbtcPrice || 0) * (1 - stats.priceChange24h / 100)
+                  stats?.sbtcPrice || 0,
+                  (stats?.sbtcPrice || 0) * (1 - (stats?.priceChange24h || 0) / 100)
                 )}
               </p>
             </div>
-            <LineChart className="size-8 text-purple-500" />
+            <LineChartIcon className="size-8 text-purple-500" />
           </div>
         </Card>
       </div>
@@ -177,7 +244,7 @@ export default function PortfolioPage() {
         <Button
           variant="outline"
           onClick={() => setIsWithdrawalModalOpen(true)}
-          disabled={stats.totalBalance === 0}
+          disabled={stats?.totalBalance === 0}
         >
           <ArrowDownLeft className="mr-2 size-4" />
           Withdraw sBTC
@@ -186,9 +253,11 @@ export default function PortfolioPage() {
 
       {/* Price Chart */}
       <div className="mb-8">
-        <PriceChart />
+        <PriceChart data={priceData} />
       </div>
 
+
+      
       {/* Recent Transactions */}
       <TransactionList
         transactions={transactions}
@@ -207,7 +276,7 @@ export default function PortfolioPage() {
         isOpen={isWithdrawalModalOpen}
         onClose={() => setIsWithdrawalModalOpen(false)}
         onSuccess={handleWithdrawalSuccess}
-        maxAmount={stats.totalBalance}
+        maxAmount={stats?.totalBalance || 0}
       />
     </div>
   )

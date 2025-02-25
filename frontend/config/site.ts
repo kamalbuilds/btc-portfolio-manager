@@ -1,13 +1,17 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: "sBTC Portfolio",
+  name: "Bitcoin Portfolio",
   description:
-    "Beautifully designed components that you can copy and paste into your apps. Accessible. Customizable. Open Source.",
+    "Track your sBTC portfolio on Stacks",
   mainNav: [
     {
       title: "Dashboard",
       href: "/portfolio",
+    },
+    {
+      title: "Positions",
+      href: "/positions",
     },
     {
       title: "Transactions",
@@ -19,8 +23,7 @@ export const siteConfig = {
     },
   ],
   links: {
-    twitter: "https://twitter.com/shadcn",
-    github: "https://github.com/shadcn/ui",
+    twitter: "https://twitter.com/kamalbuilds",
     docs: "https://ui.shadcn.com",
   },
 }

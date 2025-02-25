@@ -7,11 +7,10 @@ import { Separator } from "@/components/ui/separator"
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b">
-      {/* Hero Section */}
       <div className="container mx-auto px-4 py-16 text-center">
-        <h1 className="mb-6 text-5xl font-bold ">Track Your sBTC Portfolio</h1>
+        <h1 className="mb-6 text-5xl font-bold ">Track Your Bitcoin Portfolio</h1>
         <p className="mx-auto mb-8 max-w-2xl text-lg ">
-          Monitor your sBTC positions, manage deposits and withdrawals, and
+          Monitor your Bitcoin(sBTC) positions, manage deposits and withdrawals, and
           track your performance with our comprehensive portfolio dashboard.
         </p>
         <div className="flex justify-center space-x-4">
