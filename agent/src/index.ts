@@ -50,18 +50,28 @@ export function createAgent(
 
   nodePlugin ??= createNodePlugin();
 
+  const plugins = [
+    bootstrapPlugin,
+    nodePlugin,
+    wormholePlugin,
+    character.settings?.secrets?.WALLET_PUBLIC_KEY ? solanaPlugin : null,
+  ].filter(Boolean);
+
+  // Collect evaluators from plugins
+  const evaluators = plugins.reduce((acc, plugin) => {
+    if (plugin.evaluators) {
+      acc.push(...plugin.evaluators);
+    }
+    return acc;
+  }, []);
+
   return new AgentRuntime({
     databaseAdapter: db,
     token,
     modelProvider: character.modelProvider,
-    evaluators: [],
+    evaluators,
     character,
-    plugins: [
-      bootstrapPlugin,
-      nodePlugin,
-      wormholePlugin,
-      character.settings?.secrets?.WALLET_PUBLIC_KEY ? solanaPlugin : null,
-    ].filter(Boolean),
+    plugins,
     providers: [],
     actions: [],
     services: [],

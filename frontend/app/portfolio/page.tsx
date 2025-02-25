@@ -27,35 +27,13 @@ import { PriceChart } from "@/components/price-chart"
 import { TransactionList } from "@/components/transaction-list"
 import { WithdrawalModal } from "@/components/withdrawal-modal"
 import { useAppKitAccount } from "@reown/appkit/react"
+import { mockData } from './mock-data'
 
 interface PriceDataPoint {
   timestamp: string;
   price: number;
 }
 
-// Memoize the PriceChart component
-// const PriceChart = memo(({ data }: { data: PriceDataPoint[] }) => {
-//   return (
-//     <div className="h-64 w-full">
-//       <ResponsiveContainer width="100%" height="100%">
-//         <RechartsLineChart data={data}>
-//           <XAxis dataKey="timestamp" />
-//           <YAxis />
-//           <Tooltip />
-//           <Line
-//             type="monotone"
-//             dataKey="price"
-//             stroke="#8884d8"
-//             dot={false}
-//             isAnimationActive={false}
-//           />
-//         </RechartsLineChart>
-//       </ResponsiveContainer>
-//     </div>
-//   )
-// })
-
-// PriceChart.displayName = 'PriceChart'
 
 export default function PortfolioPage() {
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false)
@@ -76,10 +54,23 @@ export default function PortfolioPage() {
       setIsLoading(true)
       setError("")
 
-      const [portfolioStats, txHistory] = await Promise.all([
-        sbtcService.getPortfolioStats(address),
-        sbtcService.getTransactions(address),
-      ])
+      let portfolioStats, txHistory;
+
+      try {
+        // Try to fetch real data
+        [portfolioStats, txHistory] = await Promise.all([
+          sbtcService.getPortfolioStats(address),
+          sbtcService.getTransactions(address),
+        ])
+      } catch (err) {
+        // If real data fetch fails, use mock data
+        console.log('Using mock data as API is not available')
+        portfolioStats = mockData.portfolioStats
+        txHistory = mockData.transactions
+      }
+
+      // Set price data from mock data for now
+      setPriceData(mockData.priceHistory.hourly)
 
       // Only update state if the values have changed
       setStats(prevStats => {

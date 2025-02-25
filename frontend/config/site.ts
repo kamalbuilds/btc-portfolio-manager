@@ -10,7 +10,7 @@ export const siteConfig = {
       href: "/portfolio",
     },
     {
-      title: "Positions",
+      title: "Stacks Positions",
       href: "/positions",
     },
     {

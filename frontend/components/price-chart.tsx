@@ -75,7 +75,7 @@ export function PriceChart({
   return (
     <Card className="p-6">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Price History</h2>
+        <h2 className="text-xl font-semibold">Historical Wallet Balance</h2>
         <div className="flex space-x-2">
           {timeframeOptions.map((option) => (
             <button

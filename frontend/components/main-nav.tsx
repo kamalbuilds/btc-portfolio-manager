@@ -125,13 +125,13 @@ export function MainNav({ items }: MainNavProps) {
         <div className="px-4 py-3 border border-border rounded-lg flex items-center gap-1">
           <StxLogo className="w-[14px] h-[14px] shrink-0" />
           <p className="text-sm">
-            ${currency.short.format(Number(stxPrice))}
+            {currency.short.format(Number(stxPrice))}
           </p>
         </div>
         <div className="px-4 py-3 border border-border rounded-lg flex items-center gap-1">
           <BtcLogo className="w-[14px] h-[14px] shrink-0" />
           <p className="text-sm">
-            ${currency.short.format(Number(btcPrice))}
+            {currency.short.format(Number(btcPrice))}
           </p>
         </div>
       </div>

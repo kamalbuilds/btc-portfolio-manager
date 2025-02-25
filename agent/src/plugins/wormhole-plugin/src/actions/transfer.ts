@@ -76,9 +76,12 @@ export const transferAction: Action = {
         sui,
       ]);
 
-      // Compose transfer context
+
       const paramOptions = await buildTransferDetails(state, runtime);
 
+      // Remove any gaps between chain names
+      paramOptions.sourceChain = paramOptions.sourceChain.replace(/\s+/g, '') as Chain;
+      paramOptions.destinationChain = paramOptions.destinationChain.replace(/\s+/g, '') as Chain;
       const sourceChain = wh.getChain(paramOptions.sourceChain);
       const destinationChain = wh.getChain(paramOptions.destinationChain);
 
@@ -152,7 +155,7 @@ export const transferAction: Action = {
     }
   },
   validate: async (runtime: IAgentRuntime) => {
-    const privateKey = runtime.getSetting("ETH_PRIVATE_KEY");
+    const privateKey = runtime.getSetting("WALLET_PRIVATE_KEY");
     return typeof privateKey === "string" && privateKey.startsWith("0x");
   },
   examples: [
@@ -167,7 +170,7 @@ export const transferAction: Action = {
       {
         user: "user",
         content: {
-          text: "Can you help me in transferring 0.01 native token From Base Sepolia to Arbitrum Sepolia",
+          text: "Can you help me in transferring 0.001 From BaseSepolia to ArbitrumSepolia",
           action: "TRANSFER_TOKENS",
         },
       },

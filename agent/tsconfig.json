@@ -3,7 +3,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "lib": ["ESNext", "dom"],
-    "moduleResolution": "Bundler",
+    "moduleResolution": "node",
     "outDir": "./dist",
     "rootDir": ".",
     "strict": false,
@@ -19,6 +19,13 @@
     "checkJs": false,
     "noEmitOnError": false,
     "moduleDetection": "force",
-    "allowArbitraryExtensions": true
-  }
+    "allowArbitraryExtensions": true,
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

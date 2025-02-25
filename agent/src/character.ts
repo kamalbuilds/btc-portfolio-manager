@@ -4,13 +4,12 @@ import {
     defaultCharacter,
     ModelProviderName,
 } from "@elizaos/core";
-import pushPlugin from "./plugins/push-plugin/src/index.ts";
 import wormholePlugin from "./plugins/wormhole-plugin/src/index.ts";
 import { chains } from "@wormhole-foundation/sdk";
 
 export const character: Character = {
     ...defaultCharacter,
-    name: "Push AI Agent",
+    name: "X Bitcoin Investments Agent",
     plugins: [wormholePlugin],
     clients: [Clients.TELEGRAM],
     modelProvider: ModelProviderName.GROQ,

@@ -33,8 +33,7 @@ function getEnv(key: string): string {
         "5ZDaMgGNd4pU1qcTq4sKTR1o1DVYog3W1hmhPVBBtddG8oK3RBfu6YLg526RvdresZc6CFAN6tA2a3WJCS1GkaZq";
       break;
     case "ETH_PRIVATE_KEY":
-      val =
-        "0x9d1443c95ddf2cbb840fb6b54f356619962ed6bc960c816765f9e29437828fd1";
+      val = process.env.WALLET_PRIVATE_KEY;
       break;
     default:
       break;

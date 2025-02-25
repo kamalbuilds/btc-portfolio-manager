@@ -152,7 +152,7 @@ export const redeemAction: Action = {
         }
     },
     validate: async (runtime: IAgentRuntime) => {
-        const privateKey = runtime.getSetting("ETH_PRIVATE_KEY");
+        const privateKey = runtime.getSetting("WALLET_PRIVATE_KEY");
         console.log("private key", privateKey);
         return typeof privateKey === "string" && privateKey.startsWith("0x");
     },
