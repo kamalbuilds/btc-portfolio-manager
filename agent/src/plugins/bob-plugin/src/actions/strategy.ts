@@ -28,8 +28,61 @@ const buildStrategyDetails = async (
 export const STRATEGY_ACTION: Action = {
   name: 'BOB_STRATEGY_ACTION',
   description: 'Handles requests to use BOB strategies',
-  similes: [],
-  examples: [],
+  similes: [
+    'like choosing an investment portfolio',
+    'similar to selecting a savings account',
+    'like picking a yield farming strategy',
+    'comparable to choosing a DeFi vault',
+    'similar to selecting a staking option'
+  ],
+  examples: [
+    [
+      {
+        user: 'user',
+        content: {
+          text: 'What strategies are available?',
+          action: 'BOB_STRATEGY_ACTION'
+        }
+      },
+      {
+        user: 'assistant', 
+        content: {
+          text: "I can help you with that! The available strategies are Segment, Solv, Avalon, Bedrock, Pell and Ionic. Each strategy has different risk and reward profiles. Would you like to know more about any specific strategy?",
+          action: 'BOB_STRATEGY_ACTION'
+        }
+      },
+      {
+        user: 'assistant',
+        content: {
+          text: "I'll help you use the Segment strategy",
+          action: 'BOB_STRATEGY_ACTION'
+        }
+      },
+      {
+        user: 'user',
+        content: {
+          text: 'I want to use the Segment strategy with 0.5 BTC',
+          action: 'BOB_STRATEGY_ACTION'
+        }
+      }
+    ],
+    [
+      {
+        user: 'assistant',
+        content: {
+          text: "I'll help you invest in the Solv strategy",
+          action: 'BOB_STRATEGY_ACTION'
+        }
+      },
+      {
+        user: 'user',
+        content: {
+          text: 'Help me deposit 1 BTC into the Solv strategy',
+          action: 'BOB_STRATEGY_ACTION'
+        }
+      }
+    ]
+  ],
   handler: async (
     runtime: IAgentRuntime,
     message: Memory,
