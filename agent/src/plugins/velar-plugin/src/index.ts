@@ -1,6 +1,6 @@
 import { Plugin, IAgentRuntime, Memory, Evaluator } from '@elizaos/core';
-import { isSwapRequest } from './actions/patterns';
-import { SWAP_ACTION } from './actions/swap';
+import { isSwapRequest } from './actions/patterns.ts';
+import { SWAP_ACTION } from './actions/swap.ts';
 
 const swapRecognizer: Evaluator = {
   name: 'swapRecognizer',

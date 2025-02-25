@@ -97,7 +97,7 @@ export const transferAction: Action = {
           wrapped
         );
       } catch (error) {
-        //TODO: Return the eliza response for no asset wrapped
+        //TODO: Return the eliza response for no asset wrapped]]
         console.log(
           `No wrapped token found on ${destinationChain.chain}. Please try again with other chain.`
         );

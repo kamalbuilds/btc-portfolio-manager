@@ -1,6 +1,6 @@
 import { Action, IAgentRuntime, Memory, HandlerCallback, State, composeContext, generateObjectDeprecated, ModelClass } from '@elizaos/core';
-import { extractStrategyName } from './patterns';
-import { strategyTemplate } from '../template/strategyTemplate';
+import { extractStrategyName } from './patterns.ts';
+import { strategyTemplate } from '../template/strategyTemplate.ts';
 
 export interface StrategyParams {
   strategy: string;

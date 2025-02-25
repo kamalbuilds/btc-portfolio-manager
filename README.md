@@ -1,26 +1,26 @@
 # BTC Portfolio Manager
 
-A comprehensive portfolio management solution for Bitcoin assets across multiple chains, including Stacks, Rootstock, and BOB. This project enables users to track, manage, and optimize their BTC investments through various DeFi protocols and strategies.
+A comprehensive portfolio management solution for Bitcoin assets across multiple chains, including Stacks, Rootstock, and BOB. This project enables users to track, manage, and optimize their BTC investments through various DeFi protocols (Velar on Stacks , Runes on Rootstock , 5+ Strategies integrated on BOB).
 
 ## 🌟 Features
 
-- **Multi-Chain Portfolio Tracking**
+- Multi-Chain Portfolio Tracking
   - Track BTC assets across Stacks (sBTC), Rootstock, and BOB
   - Real-time portfolio valuation and performance metrics
   - Transaction history and analytics
 
-- **AI-Powered Trading Assistant**
+- AI-Powered Eliza Trading Assistant
   - Natural language interaction for trading and portfolio management
   - Automated strategy suggestions and execution
   - Risk assessment and portfolio optimization
 
-- **DeFi Protocol Integration**
+- DeFi Protocol Integration
   - Velar Protocol integration for Stacks trading
   - BOB strategies for yield generation
   - Cross-chain token swaps via Wormhole
 
-- **Smart Contract Features**
-  - ERC-7621 Basket Token Standard implementation
+- Smart Contract Features
+  - ERC-7621 Basket Token Standard implementation on Rootstock
   - Transparent upgradeable proxy contracts
   - Factory contracts for basket token deployment
 
@@ -69,19 +69,19 @@ graph TB
 
 ## 🔧 Technical Stack
 
-- **Frontend**
+- Frontend
   - Next.js 14
   - TailwindCSS
   - shadcn/ui components
   - TypeScript
 
-- **Agent**
+- Agent
   - Node.js
   - ElizaOS Core
   - Custom plugins for protocol integration
   - Natural language processing
 
-- **Smart Contracts**
+- Smart Contracts
   - Solidity
   - ERC-7621 standard
   - OpenZeppelin contracts
@@ -138,7 +138,7 @@ pnpm start
 
 ### Testnet Deployments
 
-**Rootstock Testnet:**
+Rootstock Testnet:
 - BasketTokenStandard: `0x1602cF4Ffa1da92d1708d74e5A9985593176171A`
 - BasketTokenStandardPair: `0x9dc50A13c06Bc9b46430581180158108A59308f2`
 - Factory: `0x54F686d1a8D3600f9f9Ead9ba3F31903438e0E2e`
@@ -156,19 +156,19 @@ btc-portfolio-manager/
 
 ### Key Components
 
-1. **Frontend**
+1. Frontend
    - Portfolio dashboard
    - Transaction management
    - Strategy visualization
    - Wallet integration
 
-2. **Agent**
+2. Agent
    - Natural language processing
    - Protocol-specific plugins
    - Action recognition and execution
    - State management
 
-3. **Smart Contracts**
+3. Smart Contracts
    - Basket token implementation
    - Factory contracts
    - Proxy contracts

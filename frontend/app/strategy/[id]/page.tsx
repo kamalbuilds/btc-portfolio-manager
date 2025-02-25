@@ -5,6 +5,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { ArrowDown } from "lucide-react"
+import { parseEther } from "viem"
+import { useAccount, useChainId, useSendTransaction, useWaitForTransactionReceipt } from "wagmi"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -34,10 +36,39 @@ import {
 } from "@/components/ui/table"
 import { useBasket } from "@/context/BasketContext"
 import { RunesPriceList } from "../../../config/price"
+import { Loader2 as Spinner } from "lucide-react"
 // import { GatewayQuoteParams, GatewaySDK } from "@gobob/bob-sdk"
 // import { useSendTransaction, useSignMessage, useWaitForTransactionReceipt } from '@gobob/sats-wagmi'
 
 // import { useAccount } from "@gobob/sats-wagmi"
+
+interface Rune {
+  runeid: string
+  symbol: string
+  rune: string
+  spacedRune: string
+  supply: string
+  holders: number
+  priceinusd: number
+  sats: number
+}
+
+interface Basket {
+  id: number
+  name: string
+  runes: Rune[]
+}
+
+interface Contribution {
+  percentage: number
+  amount: number
+  rune: Rune
+}
+
+interface StrategyPageProps {
+  strategy?: string
+  bts?: string
+}
 
 type Investment = {
   percentage: number
@@ -49,10 +80,18 @@ type Investments = {
   [btsId: string]: Investment
 }
 
-const StrategyPage = ({ strategy, bts }) => {
+interface Contributions {
+  [key: string]: Contribution
+}
+
+const TREASURY_ADDRESS = "0x67E6FB17f0ff00C2fA8484C3A1a0A24FE9a817bf"
+const EVM_CHAINS = ["rootstock", "bob"]
+
+const StrategyPage: React.FC<StrategyPageProps> = ({ strategy, bts }) => {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const { id } = useParams()
+  const params = useParams()
+  const id = typeof params.id === 'string' ? parseInt(params.id) : undefined
   console.log("Router", router);
   console.log("searchParams", searchParams);
   console.log("id", id);
@@ -66,13 +105,22 @@ const StrategyPage = ({ strategy, bts }) => {
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
-  const createBaskets = (data) => {
-    const baskets = [];
+  const chainId = useChainId()
+  const { address } = useAccount()
+  const { data: hash, error: txError, isPending, sendTransaction } = useSendTransaction()
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = 
+    useWaitForTransactionReceipt({ hash })
+
+  const isEVMChain = useMemo(() => {
+    return chainId && [30, 31, 5777].includes(chainId) // Rootstock and BOB chain IDs
+  }, [chainId])
+
+  const createBaskets = (data: any[]) => {
+    const baskets: Basket[] = [];
     const noOfRunesInObject = 4
     for (let i = 0; i < data.length; i += noOfRunesInObject) {
-
       const basketId = Math.floor(i / noOfRunesInObject) + 1
-      const basket = {
+      const basket: Basket = {
         id: basketId,
         name: `Basket ${Math.floor(i / noOfRunesInObject) + 1}`,
         runes: data.slice(i, i + noOfRunesInObject)
@@ -122,7 +170,8 @@ const StrategyPage = ({ strategy, bts }) => {
 
 
   const basketRunesData = useMemo(() => {
-    const currentBasket = basketData.find((basket) => basket.id == id)
+    if (!id) return null
+    const currentBasket = basketData.find((basket: Basket) => basket.id === id)
     return currentBasket
   }, [basketData, id])
 
@@ -131,12 +180,10 @@ const StrategyPage = ({ strategy, bts }) => {
   console.log("basketRunesData", basketRunesData);
 
   const [investAmount, setInvestAmount] = useState<string>("")
-  const [contributions, setContributions] = useState({});
+  const [contributions, setContributions] = useState<Contributions>({})
 
-  const handleInvestmentChange = (rune: any, value: number) => {
-    console.log("rune", rune, value);
-
-    const newContributions = {
+  const handleInvestmentChange = (rune: Rune, value: number) => {
+    const newContributions: Contributions = {
       ...contributions,
       [rune.runeid]: {
         percentage: value,
@@ -145,19 +192,35 @@ const StrategyPage = ({ strategy, bts }) => {
       }
     };
 
-    const total = Object.values(newContributions).reduce((acc, curr) => acc + curr.percentage, 0);
+    const total = Object.values(newContributions).reduce(
+      (acc: number, curr: Contribution) => acc + curr.percentage, 
+      0
+    );
+
     if (total <= 100) {
       setContributions(newContributions);
     } else {
       console.warn("Total percentage cannot exceed 100%");
     }
-
   }
 
   console.log("contributions", contributions);
 
-
   const handleInvest = async () => {
+    if (!investAmount || !address) return
+
+    if (isEVMChain) {
+      try {
+        // Send native tokens to treasury
+        await sendTransaction({
+          to: TREASURY_ADDRESS,
+          value: parseEther(investAmount),
+        })
+      } catch (error) {
+        console.error("Failed to send transaction:", error)
+      }
+      return
+    }
 
     if(selectedAction === "Cross-Chain Invest"){
       setBridgeDialogOpen(true)
@@ -352,68 +415,88 @@ const StrategyPage = ({ strategy, bts }) => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {basketRunesData &&
-                      basketRunesData.runes.map((rune) => (
-                        <TableRow key={rune.runeid}>
-                          <TableCell className="font-medium">
-                            <div>
-                              {rune.symbol}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-col">
-                              <p className="text-lg font-medium leading-none">
-                                {rune.rune}
-                              </p>
-                              <p className="text-muted-foreground text-sm">
-                                {rune.spacedRune}
-                              </p>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <p className="capitalize">{Number(rune.supply).toLocaleString()}</p>
-                          </TableCell>
-                          <TableCell>
-                            <p className="">{rune.holders.toLocaleString()}</p>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-col">
-                              <p className="text-lg font-medium leading-none">
-                                {rune.sats} sats
-                              </p>
-                              <p className="text-muted-foreground text-sm">
-                                ${rune.priceinusd}
-                              </p>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center gap-2">
-                              <Slider
-                                onValueChange={(value) => {
-                                  handleInvestmentChange(rune, value[0])
-                                }}
-                                max={100}
-                                value={[contributions[rune.runeid]?.percentage || 0]}
-                                className="w-[250px]"
-                              />
-                              <p>{contributions[rune.runeid]?.percentage} %</p>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                    {basketRunesData?.runes.map((rune: Rune) => (
+                      <TableRow key={rune.runeid}>
+                        <TableCell className="font-medium">
+                          <div>
+                            {rune.symbol}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            <p className="text-lg font-medium leading-none">
+                              {rune.rune}
+                            </p>
+                            <p className="text-muted-foreground text-sm">
+                              {rune.spacedRune}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <p className="capitalize">{Number(rune.supply).toLocaleString()}</p>
+                        </TableCell>
+                        <TableCell>
+                          <p className="">{rune.holders.toLocaleString()}</p>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            <p className="text-lg font-medium leading-none">
+                              {rune.sats} sats
+                            </p>
+                            <p className="text-muted-foreground text-sm">
+                              ${rune.priceinusd}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center gap-2">
+                            <Slider
+                              onValueChange={(value) => {
+                                handleInvestmentChange(rune, value[0])
+                              }}
+                              max={100}
+                              value={[contributions[rune.runeid]?.percentage || 0]}
+                              className="w-[250px]"
+                            />
+                            <p>{contributions[rune.runeid]?.percentage || 0}%</p>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               )}
             </div>
           </div>
-          <div className="mt-4 flex justify-center">
+          <div className="mt-4 flex flex-col items-center justify-center gap-4">
             <Button
               size="lg"
               className="w-md cursor-pointer"
               onClick={handleInvest}
+              disabled={!investAmount || isPending || isConfirming}
             >
-              Invest
+              {isPending ? "Confirming..." : 
+               isConfirming ? "Processing..." : 
+               "Invest"}
             </Button>
+
+            {txError && (
+              <p className="text-sm text-red-500">
+                Error: {txError.message}
+              </p>
+            )}
+
+            {hash && (
+              <p className="text-sm text-gray-500">
+                Transaction Hash: {hash}
+              </p>
+            )}
+
+            {isConfirmed && (
+              <p className="text-sm text-green-500">
+                Transaction confirmed! Your investment has been processed.
+              </p>
+            )}
           </div>
         </>
       )}
@@ -484,7 +567,7 @@ const StrategyPage = ({ strategy, bts }) => {
           {hash && <div className="text-sm text-gray-500">Transaction Hash: {hash}</div>}
           {isConfirming && <div className="text-sm text-blue-500">Confirming transaction...</div>}
           {isConfirmed && <div className="text-sm text-green-500">Transaction confirmed!</div>}
-          {error && <div className="text-sm text-red-500">Error: {error.message}</div>}
+          {txError && <div className="text-sm text-red-500">Error: {txError.message}</div>}
         </div>
       )}
     </div>

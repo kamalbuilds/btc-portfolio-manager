@@ -1,6 +1,6 @@
 import { Plugin, IAgentRuntime, Memory, Evaluator } from '@elizaos/core';
-import { isStrategyRequest } from './actions/patterns';
-import { STRATEGY_ACTION } from './actions/strategy';
+import { isStrategyRequest } from './actions/patterns.ts';
+import { STRATEGY_ACTION } from './actions/strategy.ts';
 
 const strategyRecognizer: Evaluator = {
   name: 'strategyRecognizer',

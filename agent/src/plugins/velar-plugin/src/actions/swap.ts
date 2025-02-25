@@ -1,6 +1,6 @@
 import { Action, IAgentRuntime, Memory, HandlerCallback, State, composeContext, generateObjectDeprecated, ModelClass } from '@elizaos/core';
 import { extractSwapDetails } from './patterns';
-import { swapTemplate } from '../template/swapTemplate';
+import { swapTemplate } from '../template/swapTemplate.ts';
 import { VelarSDK, ISwapService, SwapResponse, AmountOutResponse } from '@velarprotocol/velar-sdk';
 import { openContractCall, ContractCallOptions } from '@stacks/connect';
 import { AnchorMode } from '@stacks/transactions';

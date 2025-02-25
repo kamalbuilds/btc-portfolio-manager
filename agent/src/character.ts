@@ -6,11 +6,13 @@ import {
 } from "@elizaos/core";
 import wormholePlugin from "./plugins/wormhole-plugin/src/index.ts";
 import { chains } from "@wormhole-foundation/sdk";
+import velarPlugin from "./plugins/velar-plugin/src/index.ts";
+import bobPlugin from "./plugins/bob-plugin/src/index.ts";
 
 export const character: Character = {
     ...defaultCharacter,
     name: "X Bitcoin Investments Agent",
-    plugins: [wormholePlugin],
+    plugins: [wormholePlugin , velarPlugin , bobPlugin],
     clients: [Clients.TELEGRAM],
     modelProvider: ModelProviderName.GROQ,
     lore: [

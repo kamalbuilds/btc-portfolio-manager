@@ -173,16 +173,16 @@ export function numberToDaysAndHours(number) {
 
 export function generateMetaData(title, description) {
   return {
-    metadataBase: new URL("https://www.stacking-tracker.com/"),
+    metadataBase: new URL("https://xbtc-portfolio-and-investment-manager.vercel.app/"),
     title: title,
     description: description,
-    applicationName: "Stacking Tracker",
+    applicationName: "Bitcoin Portfolio and Investment Tracker",
 
     openGraph: {
       title: title,
       description: description,
-      url: "https://www.stacking-tracker.com/",
-      siteName: "Stacking Tracker",
+      url: "https://xbtc-portfolio-and-investment-manager.vercel.app/",
+      siteName: "Bitcoin Portfolio and Investment Tracker",
       images: [
         {
           url: "https://www.stacking-tracker.com/share.png",

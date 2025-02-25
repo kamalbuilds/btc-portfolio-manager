@@ -24,6 +24,8 @@ import {
 } from "./config/index.ts";
 import { initializeDatabase } from "./database/index.ts";
 import wormholePlugin from "./plugins/wormhole-plugin/src/index.ts";
+// import velarPlugin from "./plugins/velar-plugin/src/index.ts";
+import bobPlugin from "./plugins/bob-plugin/src/index.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -54,6 +56,8 @@ export function createAgent(
     bootstrapPlugin,
     nodePlugin,
     wormholePlugin,
+    // velarPlugin,
+    bobPlugin,
     character.settings?.secrets?.WALLET_PUBLIC_KEY ? solanaPlugin : null,
   ].filter(Boolean);
 

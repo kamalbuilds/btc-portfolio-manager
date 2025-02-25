@@ -13,7 +13,7 @@ export async function generateMetadata() {
   const info = {
     title: `Stacking Tracker - Positions`,
     description:
-      "All your PoX positions on Stacks in one simple overview! Connect your wallet to view your balances.",
+      "All your Defi positions on Stacks in one simple overview! Connect your wallet to view your balances.",
   };
   return generateMetaData(info.title, info.description);
 }
