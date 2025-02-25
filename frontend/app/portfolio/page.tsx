@@ -35,8 +35,7 @@ export default function PortfolioPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState("")
 
-  const { address, isConnected, caipAddress, status, embeddedWalletInfo } = useAppKitAccount()
-
+  const address = 'SP1JNQEQE3NKFD6W0JWWNJD1P1M906P9EYSV671B5';
   useEffect(() => {
     const fetchData = async () => {
 
