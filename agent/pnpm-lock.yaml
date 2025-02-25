@@ -56,6 +56,9 @@ importers:
       '@stacks/connect':
         specifier: ^7.10.1
         version: 7.10.1
+      '@stacks/network':
+        specifier: ^7.0.0
+        version: 7.0.2
       '@stacks/transactions':
         specifier: ^6.17.0
         version: 6.17.0

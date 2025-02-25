@@ -2,8 +2,9 @@ import { Action, IAgentRuntime, Memory, HandlerCallback, State, composeContext, 
 import { extractSwapDetails } from './patterns';
 import { swapTemplate } from '../template/swapTemplate';
 import { VelarSDK, ISwapService, SwapResponse, AmountOutResponse } from '@velarprotocol/velar-sdk';
-import { openContractCall, ConnectNetwork } from '@stacks/connect';
+import { openContractCall, ContractCallOptions } from '@stacks/connect';
 import { AnchorMode } from '@stacks/transactions';
+import type { StacksNetwork } from '@stacks/network';
 
 export interface SwapParams {
   inToken: string;
@@ -131,21 +132,21 @@ export const SWAP_ACTION: Action = {
 
       // Get computed amount to show expected output
       const computedAmount: AmountOutResponse = await swapInstance.getComputedAmount({
-        amount,
-        slippage
+        amount: Number(amount),
+        slippage: Number(slippage)
       });
 
       // Get swap options
       const swapOptions: SwapResponse = await swapInstance.swap({
-        amount
+        amount: Number(amount)
       });
 
       // Build contract call options
-      const options = {
+      const contractCallOptions: ContractCallOptions = {
         ...swapOptions,
-        network: runtime.getSetting('STACKS_NETWORK') as ConnectNetwork,
+        network: 'testnet',
         appDetails: {
-          name: 'BOB Portfolio Manager',
+          name: 'Bitcoin Portfolio Management',
           icon: 'https://bob.io/icon.png'
         },
         anchorMode: AnchorMode.Any,
@@ -173,20 +174,20 @@ export const SWAP_ACTION: Action = {
       // Show preview and ask for confirmation
       if (callback) {
         callback({
-          text: `You'll be swapping ${amount} ${inToken} for approximately ${computedAmount.amount} ${outToken} (slippage: ${slippage}%).\n\nWould you like to proceed with the swap?`,
+          text: `You'll be swapping ${amount} ${inToken} for approximately ${computedAmount.value} ${outToken} (slippage: ${slippage}%).\n\nWould you like to proceed with the swap?`,
           content: {
             preview: true,
             inToken,
             outToken,
             amount,
-            expectedOutput: computedAmount.amount,
+            expectedOutput: computedAmount.value,
             slippage
           }
         });
       }
 
       // Open contract call
-      await openContractCall(options);
+      await openContractCall(contractCallOptions);
       return true;
 
     } catch (error) {
